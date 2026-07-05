@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -16,9 +16,22 @@ def create_app():
 
     db.init_app(app)
 
+    from auth import auth_bp
+    from admin import admin_bp
+    from staff import staff_bp
+    from user import user_bp
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(staff_bp)
+    app.register_blueprint(user_bp)
+
+    @app.route('/')
+    def index():
+        role = session.get('role')
+        if role in ('admin', 'staff', 'trekker'):
+            endpoint = {'admin': 'admin.dashboard', 'staff': 'staff.dashboard', 'trekker': 'user.dashboard'}[role]
+            return redirect(url_for(endpoint))
+        return redirect(url_for('auth.login'))
+
     return app
-
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
