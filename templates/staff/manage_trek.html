@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'staff/_nav.html' %}
+<h3>{{ trek.name }}</h3>
+
+<div class="row mb-4">
+  <div class="col-md-3"><strong>Location</strong><br>{{ trek.location }}</div>
+  <div class="col-md-3"><strong>Duration</strong><br>{{ trek.duration_days }} days</div>
+  <div class="col-md-3"><strong>Start Date</strong><br>{{ trek.start_date or '-' }}</div>
+  <div class="col-md-3"><strong>End Date</strong><br>{{ trek.end_date or '-' }}</div>
+</div>
+
+<form method="POST" class="row g-3 mb-4">
+  <input type="hidden" name="action" value="update">
+  <div class="col-md-4">
+    <label class="form-label">Available Slots</label>
+    <input type="number" name="available_slots" min="0" class="form-control" value="{{ trek.available_slots }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Status</label>
+    <select name="status" class="form-select">
+      <option value="Open" {{ 'selected' if trek.status == 'Open' else '' }}>Open</option>
+      <option value="Closed" {{ 'selected' if trek.status == 'Closed' else '' }}>Closed</option>
+    </select>
+  </div>
+  <div class="col-md-4 d-flex align-items-end">
+    <button type="submit" class="btn btn-primary">Update</button>
+  </div>
+</form>
+
+<h5>Participants ({{ participants|length }})</h5>
+<table class="table table-bordered mb-4">
+  <thead>
+    <tr><th>User</th><th>Email</th><th>Booking Date</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for booking in participants %}
+    <tr>
+      <td>{{ booking.user.name }}</td>
+      <td>{{ booking.user.email }}</td>
+      <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+      <td>{{ booking.status }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" class="text-center">No participants yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<form method="POST" style="display:inline;">
+  <input type="hidden" name="action" value="mark_started">
+  <button type="submit" class="btn btn-success">Mark as Started</button>
+</form>
+<form method="POST" style="display:inline;">
+  <input type="hidden" name="action" value="mark_completed">
+  <button type="submit" class="btn btn-secondary">Mark as Completed</button>
+</form>
+{% endblock %}

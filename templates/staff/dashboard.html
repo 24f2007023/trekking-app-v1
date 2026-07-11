@@ -1,5 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Welcome, {{ session.get('name') }}</h3>
-<p>Your assigned treks and participant management are coming in a later milestone.</p>
+{% include 'staff/_nav.html' %}
+<h3>My Dashboard</h3>
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Assigned Treks</h6>
+      <h3>{{ treks|length }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Total Participants</h6>
+      <h3>{{ total_participants }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Open Treks</h6>
+      <h3>{{ open_treks }}</h3>
+    </div>
+  </div>
+</div>
+
+<h5>My Assigned Treks</h5>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>Trek Name</th><th>Location</th><th>Participants</th><th>Slots</th><th>Status</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for trek in treks %}
+    <tr>
+      <td>{{ trek.name }}</td>
+      <td>{{ trek.location }}</td>
+      <td>{{ trek.bookings|selectattr('status', 'equalto', 'Booked')|list|length }}</td>
+      <td>{{ trek.available_slots }}</td>
+      <td>{{ trek.status }}</td>
+      <td><a href="{{ url_for('staff.manage_trek', trek_id=trek.id) }}" class="btn btn-sm btn-primary">Manage</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="text-center">No treks assigned to you yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
