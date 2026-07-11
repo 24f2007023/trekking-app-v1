@@ -2,6 +2,24 @@
 {% block content %}
 {% include 'admin/_nav.html' %}
 <h3>All Bookings</h3>
+
+<form method="GET" class="row g-2 mb-4">
+  <div class="col-md-5">
+    <input type="text" name="q" class="form-control" placeholder="Search by user or trek name" value="{{ q }}">
+  </div>
+  <div class="col-md-4">
+    <select name="status" class="form-select">
+      <option value="">All Statuses</option>
+      {% for s in statuses %}
+      <option value="{{ s }}" {{ 'selected' if status == s else '' }}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-primary w-100">Filter</button>
+  </div>
+</form>
+
 <table class="table table-bordered">
   <thead>
     <tr><th>Booking ID</th><th>User</th><th>Trek</th><th>Booking Date</th><th>Status</th></tr>

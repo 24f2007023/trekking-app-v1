@@ -70,6 +70,9 @@ def manage_trek(trek_id):
 
         elif action == 'mark_completed':
             trek.status = 'Completed'
+            for booking in trek.bookings:
+                if booking.status == 'Booked':
+                    booking.status = 'Completed'
             db.session.commit()
             flash('Trek marked as completed.', 'success')
 

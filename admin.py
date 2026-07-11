@@ -228,8 +228,21 @@ def user_unblacklist(user_id):
     return redirect(url_for('admin.users'))
 
 
+BOOKING_STATUSES = ['Booked', 'Cancelled', 'Completed']
+
+
 @admin_bp.route('/bookings')
 @role_required('admin')
 def bookings():
-    bookings_list = Booking.query.order_by(Booking.booking_date.desc()).all()
-    return render_template('admin/bookings.html', bookings=bookings_list)
+    q = request.args.get('q', '').strip()
+    status = request.args.get('status', '').strip()
+
+    query = Booking.query.join(User).join(Trek)
+    if q:
+        query = query.filter(db.or_(User.name.ilike(f'%{q}%'), Trek.name.ilike(f'%{q}%')))
+    if status in BOOKING_STATUSES:
+        query = query.filter(Booking.status == status)
+    bookings_list = query.order_by(Booking.booking_date.desc()).all()
+
+    return render_template('admin/bookings.html', bookings=bookings_list, q=q, status=status,
+                            statuses=BOOKING_STATUSES)
