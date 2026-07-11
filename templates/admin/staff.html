@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'admin/_nav.html' %}
+<h3>Staff Requests</h3>
+<div class="mb-3">
+  <a href="{{ url_for('admin.staff', tab='pending') }}" class="btn btn-sm {{ 'btn-primary' if tab == 'pending' else 'btn-outline-primary' }}">Pending ({{ counts.pending }})</a>
+  <a href="{{ url_for('admin.staff', tab='approved') }}" class="btn btn-sm {{ 'btn-primary' if tab == 'approved' else 'btn-outline-primary' }}">Approved ({{ counts.approved }})</a>
+  <a href="{{ url_for('admin.staff', tab='blacklisted') }}" class="btn btn-sm {{ 'btn-primary' if tab == 'blacklisted' else 'btn-outline-primary' }}">Blacklisted ({{ counts.blacklisted }})</a>
+</div>
+<form method="GET" class="mb-3">
+  <input type="hidden" name="tab" value="{{ tab }}">
+  <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search by name or ID" style="max-width: 300px;">
+</form>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>Staff ID</th><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for profile in profiles %}
+    <tr>
+      <td>{{ profile.id }}</td>
+      <td>{{ profile.user.name }}</td>
+      <td>{{ profile.user.email }}</td>
+      <td>{{ profile.approval_status }}</td>
+      <td>
+        {% if tab == 'pending' %}
+        <form method="POST" action="{{ url_for('admin.staff_approve', profile_id=profile.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-success">Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.staff_reject', profile_id=profile.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+        </form>
+        {% elif tab == 'approved' %}
+        <form method="POST" action="{{ url_for('admin.staff_blacklist', profile_id=profile.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-danger">Blacklist</button>
+        </form>
+        {% elif tab == 'blacklisted' %}
+        <form method="POST" action="{{ url_for('admin.staff_unblacklist', profile_id=profile.id) }}" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-success">Reinstate</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="text-center">No staff in this category.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

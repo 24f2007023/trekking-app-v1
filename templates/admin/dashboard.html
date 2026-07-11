@@ -1,5 +1,51 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Welcome, {{ session.get('name') }}</h3>
-<p>Admin dashboard with treks, staff, and booking management is coming in a later milestone.</p>
+{% include 'admin/_nav.html' %}
+<h3>Admin Dashboard</h3>
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6>Total Treks</h6>
+      <h3>{{ total_treks }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6>Total Users</h6>
+      <h3>{{ total_users }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6>Total Staff</h6>
+      <h3>{{ total_staff }}</h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6>Total Bookings</h6>
+      <h3>{{ total_bookings }}</h3>
+    </div>
+  </div>
+</div>
+
+<h5>Recent Bookings</h5>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>Booking ID</th><th>User</th><th>Trek</th><th>Booking Date</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for b in recent_bookings %}
+    <tr>
+      <td>{{ b.id }}</td>
+      <td>{{ b.user.name }}</td>
+      <td>{{ b.trek.name }}</td>
+      <td>{{ b.booking_date.strftime('%d %b %Y') }}</td>
+      <td>{{ b.status }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="text-center">No bookings yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
