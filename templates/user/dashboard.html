@@ -1,5 +1,55 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Welcome, {{ session.get('name') }}</h3>
-<p>Available treks and your bookings are coming in a later milestone.</p>
+{% include 'user/_nav.html' %}
+<h3>Available Treks</h3>
+
+<form method="GET" class="row g-2 mb-4">
+  <div class="col-md-4">
+    <input type="text" name="q" class="form-control" placeholder="Search by name" value="{{ q }}">
+  </div>
+  <div class="col-md-3">
+    <select name="difficulty" class="form-select">
+      <option value="">All Difficulties</option>
+      {% for d in difficulties %}
+      <option value="{{ d }}" {{ 'selected' if difficulty == d else '' }}>{{ d }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <input type="text" name="location" class="form-control" placeholder="Location" value="{{ location }}">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Filter</button>
+  </div>
+</form>
+
+<table class="table table-bordered">
+  <thead>
+    <tr><th>Trek Name</th><th>Location</th><th>Difficulty</th><th>Duration</th><th>Slots</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+    {% for trek in treks %}
+    <tr>
+      <td>{{ trek.name }}</td>
+      <td>{{ trek.location }}</td>
+      <td>{{ trek.difficulty }}</td>
+      <td>{{ trek.duration_days }} days</td>
+      <td>{{ trek.available_slots }}</td>
+      <td>
+        {% if trek.id in my_booked_trek_ids %}
+          <span class="badge bg-secondary">Already Booked</span>
+        {% elif trek.available_slots <= 0 %}
+          <span class="badge bg-danger">Full</span>
+        {% else %}
+          <form method="POST" action="{{ url_for('user.book_trek', trek_id=trek.id) }}">
+            <button type="submit" class="btn btn-sm btn-success">Book</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="text-center">No open treks match your search.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
